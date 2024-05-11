@@ -144,7 +144,7 @@ fn navigate_slides(
                         slide_image_res.0 = (slide_image_res.0 + 1) % SLIDES.len();
                     }
                     "Skip" => {
-                        state.set(AppState::Game);
+                        state.set(AppState::Map);
                         return;
                     }
                     _ => {}

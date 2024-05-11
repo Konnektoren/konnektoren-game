@@ -6,4 +6,5 @@ pub enum AppState {
     Splash,
     Slides,
     Game,
+    Map,
 }

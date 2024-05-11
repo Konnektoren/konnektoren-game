@@ -28,6 +28,7 @@ bevy = { version = "0.13", default-features = false, features = [
     "bevy_debug_stepping",
 ] }
 bevy_kira_audio = { version = "0.19" }
+konnektoren-core = { git = "https://github.com/konnektoren/konnektoren-rs.git", default-features = false }
 
 [profile.dev]
 opt-level = 1
