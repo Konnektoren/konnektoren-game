@@ -166,12 +166,8 @@ fn challenge_interaction_system(
                     log::error!("Error creating challenge: {}", e);
                 }
             },
-            Interaction::Hovered => {
-                // Optionally handle hover state
-            }
-            Interaction::None => {
-                // Optionally handle the transition to no interaction
-            }
+            Interaction::Hovered => {}
+            Interaction::None => {}
             _ => {}
         }
     }
