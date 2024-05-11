@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <title>Konnektoren</title> <!-- ToDo -->
+        
+        <link rel="icon" href="assets/logo.png">
+    
+<link rel="modulepreload" href="/konnektoren-game-28b5a9cf5344131e.js" crossorigin=anonymous integrity="sha384-w8TczIFY1gRfj69trlRi1a2DrKDH84j9O65y9S5fN3ML6LXJlmZjcGgYIddfRCga">
+<link rel="preload" href="/konnektoren-game-28b5a9cf5344131e_bg.wasm" crossorigin=anonymous integrity="sha384-mWBoBkyeILWMrQmzTdHcU0cQCKjg8/FpiOQMrF7cfTVLy00Nks/IuGWqk9ure0Q1" as="fetch" type="application/wasm"></head>
+    <body>
+        <div class="game-container">
+            <div class="lds-dual-ring"></div>
+            <canvas id="bevy">
+                Javascript and support for canvas is required
+            </canvas>
+        </div>
+    
+<script type="module">
+import init, * as bindings from '/konnektoren-game-28b5a9cf5344131e.js';
+const wasm = await init('/konnektoren-game-28b5a9cf5344131e_bg.wasm');
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script></body>
+</html>
