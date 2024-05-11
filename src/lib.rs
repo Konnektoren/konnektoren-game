@@ -1,5 +1,6 @@
 pub mod app_state;
 pub mod screen;
+pub mod slides;
 pub mod splash;
 
 pub mod prelude {

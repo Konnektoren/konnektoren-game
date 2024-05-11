@@ -4,5 +4,6 @@ use bevy::ecs::schedule::States;
 pub enum AppState {
     #[default]
     Splash,
+    Slides,
     Game,
 }

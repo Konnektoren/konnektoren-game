@@ -1,5 +1,5 @@
 use bevy::{asset::AssetMetaCheck, prelude::*};
-use konnektoren_game::{app_state::AppState, screen, splash::splash_plugin};
+use konnektoren_game::{app_state::AppState, screen, slides::slides_plugin, splash::splash_plugin};
 
 fn main() {
     App::new()
@@ -17,6 +17,6 @@ fn main() {
         }))
         .init_state::<AppState>()
         .add_systems(Startup, screen::setup)
-        .add_plugins(splash_plugin)
+        .add_plugins((splash_plugin, slides_plugin))
         .run();
 }

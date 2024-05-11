@@ -49,6 +49,6 @@ fn countdown(
     mut timer: ResMut<SplashTimer>,
 ) {
     if timer.tick(time.delta()).finished() {
-        app_state.set(AppState::Game);
+        app_state.set(AppState::Slides);
     }
 }
