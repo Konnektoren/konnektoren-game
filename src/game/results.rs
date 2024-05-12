@@ -10,6 +10,10 @@ impl Plugin for ResultsPlugin {
         app.init_resource::<DisplayedResults>()
             .add_systems(OnEnter(AppState::Game), setup)
             .add_systems(Update, update.run_if(in_state(AppState::Game)))
+            .add_systems(
+                Update,
+                update_background_color.run_if(in_state(AppState::Game)),
+            )
             .add_systems(OnExit(AppState::Game), despawn_screen::<ResultsEntity>);
     }
 }
@@ -17,13 +21,16 @@ impl Plugin for ResultsPlugin {
 #[derive(Component)]
 struct ResultsEntity;
 
+#[derive(Component)]
+struct ResultsBackground;
+
 #[derive(Default, Resource)]
 struct DisplayedResults {
     count: usize,
 }
 
 fn calculate_results(game_state: &GameState) -> Vec<String> {
-    match (
+    let results = match (
         &game_state.challenge.challenge_type,
         &game_state.challenge.challenge_result,
     ) {
@@ -41,7 +48,22 @@ fn calculate_results(game_state: &GameState) -> Vec<String> {
                 },
             )
         }
-    }
+    };
+
+    results
+}
+
+fn last_result_color(results: &[String]) -> Color {
+    results
+        .last()
+        .map(|result| {
+            if result.starts_with("Correct") {
+                Color::rgb(0.0, 1.0, 0.0)
+            } else {
+                Color::rgb(1.0, 0.0, 0.0)
+            }
+        })
+        .unwrap_or(Color::rgb(0.1, 0.1, 0.1))
 }
 
 fn calculate_score(results: &[String], game_state: &GameState) -> f32 {
@@ -69,17 +91,20 @@ fn setup(
         color: Color::WHITE,
     };
 
-    commands
-        .spawn(TextBundle {
+    commands.spawn((
+        TextBundle {
             text: Text::from_section("Calculating score...", text_style.clone())
                 .with_justify(JustifyText::Center),
             style: Style {
-                align_self: AlignSelf::Center,
+                top: Val::Px(20.0),
+                left: Val::Px(10.0),
                 ..default()
             },
             ..default()
-        })
-        .insert(ResultsEntity);
+        },
+        ResultsBackground,
+        ResultsEntity,
+    ));
 
     displayed_results.count = 0;
 }
@@ -139,4 +164,31 @@ fn update(
     }
 
     displayed_results.count = results.len();
+}
+
+fn update_background_color(
+    mut background_query: Query<&mut BackgroundColor, With<ResultsBackground>>,
+    game_state: Res<GameState>,
+) {
+    let results = calculate_results(&game_state);
+    let new_color = last_result_color(&results);
+
+    if let Ok(mut background_color) = background_query.get_single_mut() {
+        *background_color = new_color.into();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_last_result_color() {
+        let results = vec![
+            "Correct: What is 1 + 1?".to_string(),
+            "Incorrect: What is 2 + 2?".to_string(),
+        ];
+
+        assert_eq!(last_result_color(&results), Color::rgb(1.0, 0.0, 0.0));
+    }
 }

@@ -1,5 +1,6 @@
 use bevy::app::{App, Plugin};
 
+mod background;
 mod options;
 mod question;
 mod results;
@@ -14,6 +15,7 @@ impl Plugin for GamePlugin {
             question::QuestionPlugin,
             options::OptionsPlugin,
             results::ResultsPlugin,
+            background::BackgroundPlugin,
         ));
     }
 }
