@@ -1,52 +1,29 @@
-use bevy::{
-    app::{App, Update},
-    asset::{AssetServer, Handle},
-    ecs::{
-        component::Component,
-        query::{Changed, With},
-        schedule::{common_conditions::in_state, IntoSystemConfigs, OnEnter, OnExit},
-        system::{Commands, Query, Res, ResMut},
-    },
-    hierarchy::{BuildChildren, ChildBuilder},
-    log,
-    prelude::default,
-    render::color::Color,
-    text::{Font, TextStyle},
-    ui::{
-        node_bundles::{ButtonBundle, NodeBundle, TextBundle},
-        widget::Button,
-        AlignItems, AlignSelf, FlexDirection, Interaction, JustifyContent, PositionType, Style,
-        UiRect, Val,
-    },
-};
+use bevy::{log, prelude::*};
 use konnektoren_core::{
-    challenges::{ChallengeResult, ChallengeType},
+    challenges::ChallengeType,
     commands::{game_commands::SolveOptionCommand, GameCommand},
 };
 
 use crate::{app_state::AppState, game_state::GameState, prelude::despawn_screen};
 
-pub fn challenge_plugin(app: &mut App) {
-    app.add_systems(OnEnter(AppState::Game), challenge_setup)
-        .add_systems(
-            Update,
-            challenge_interaction_system.run_if(in_state(AppState::Game)),
-        )
-        .add_systems(Update, update_results.run_if(in_state(AppState::Game)))
-        .add_systems(OnExit(AppState::Game), despawn_screen::<ChallengeScreen>);
+pub struct OptionsPlugin;
+
+impl Plugin for OptionsPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(OnEnter(AppState::Game), setup)
+            .add_systems(Update, update.run_if(in_state(AppState::Game)))
+            .add_systems(OnExit(AppState::Game), despawn_screen::<OptionsEntity>);
+    }
 }
 
 #[derive(Component)]
-struct ChallengeScreen;
+struct OptionsEntity;
 
 #[derive(Component)]
 struct OptionNode {
     index: usize,
     name: String,
 }
-
-#[derive(Component)]
-struct ChallengeResultText(String);
 
 fn create_button(commands: &mut ChildBuilder, index: usize, text: &str, font: Handle<Font>) {
     commands
@@ -81,17 +58,7 @@ fn create_button(commands: &mut ChildBuilder, index: usize, text: &str, font: Ha
         });
 }
 
-fn challenge_setup(
-    mut commands: Commands,
-    game_state: Res<GameState>,
-    asset_server: Res<AssetServer>,
-) {
-    let text = format!(
-        "Challenge: {}\n\n{}",
-        game_state.challenge.challenge_config.name,
-        game_state.challenge.challenge_config.description
-    );
-
+fn setup(mut commands: Commands, game_state: Res<GameState>, asset_server: Res<AssetServer>) {
     commands
         .spawn((
             NodeBundle {
@@ -105,18 +72,9 @@ fn challenge_setup(
                 background_color: Color::NONE.into(),
                 ..default()
             },
-            ChallengeScreen,
+            OptionsEntity,
         ))
         .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                text,
-                TextStyle {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            ));
-
             parent
                 .spawn(NodeBundle {
                     style: Style {
@@ -149,7 +107,7 @@ fn challenge_setup(
         });
 }
 
-fn challenge_interaction_system(
+fn update(
     mut interaction_query: Query<(&Interaction, &OptionNode), (Changed<Interaction>, With<Button>)>,
     mut game_state: ResMut<GameState>,
 ) {
@@ -163,39 +121,4 @@ fn challenge_interaction_system(
             log::info!("Option selected: {}", option.name);
         }
     }
-}
-
-fn update_results(mut commands: Commands, game_state: Res<GameState>) {
-    let challenge = &game_state.challenge;
-
-    let results: Vec<String> = match (&challenge.challenge_type, &challenge.challenge_result) {
-        (ChallengeType::MultipleChoice(dataset), ChallengeResult::MultipleChoice(options)) => {
-            dataset.questions.iter().zip(options.iter()).fold(
-                Vec::new(),
-                |mut acc, (question, option)| {
-                    let correct = question.option == option.id;
-                    let result = if correct { "Correct" } else { "Incorrect" };
-                    acc.push(format!("{}: {}", question.question, result));
-                    acc
-                },
-            )
-        }
-
-        _ => Vec::new(),
-    };
-
-    commands.spawn((
-        NodeBundle {
-            style: Style {
-                width: Val::Percent(100.0),
-                height: Val::Percent(50.0),
-                flex_direction: FlexDirection::ColumnReverse,
-                justify_content: JustifyContent::FlexStart,
-                ..default()
-            },
-            background_color: Color::NONE.into(),
-            ..default()
-        },
-        ChallengeResultText(results.join("\n")),
-    ));
 }

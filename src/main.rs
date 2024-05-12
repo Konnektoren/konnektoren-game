@@ -1,7 +1,7 @@
 use bevy::{asset::AssetMetaCheck, prelude::*};
 use konnektoren_game::{
-    app_state::AppState, challenge::challenge_plugin, game_state::GameState, map::map_plugin,
-    screen, slides::slides_plugin, splash::splash_plugin,
+    app_state::AppState, game::GamePlugin, game_state::GameState, map::map_plugin, screen,
+    slides::slides_plugin, splash::splash_plugin,
 };
 
 fn main() {
@@ -21,6 +21,6 @@ fn main() {
         .insert_resource(GameState::default())
         .init_state::<AppState>()
         .add_systems(Startup, screen::setup)
-        .add_plugins((splash_plugin, slides_plugin, map_plugin, challenge_plugin))
+        .add_plugins((splash_plugin, slides_plugin, map_plugin, GamePlugin))
         .run();
 }

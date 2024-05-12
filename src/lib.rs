@@ -1,5 +1,5 @@
 pub mod app_state;
-pub mod challenge;
+pub mod game;
 pub mod game_state;
 pub mod map;
 pub mod screen;
