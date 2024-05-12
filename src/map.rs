@@ -1,11 +1,7 @@
 use bevy::{log, prelude::*};
 use konnektoren_core::challenges::ChallengeConfig;
 
-use crate::{
-    app_state::{self, AppState},
-    game_state::GameState,
-    prelude::despawn_screen,
-};
+use crate::{app_state::AppState, game_state::GameState, prelude::despawn_screen};
 
 #[derive(Component)]
 struct OnMapScreen;
@@ -168,7 +164,6 @@ fn challenge_interaction_system(
             },
             Interaction::Hovered => {}
             Interaction::None => {}
-            _ => {}
         }
     }
 }

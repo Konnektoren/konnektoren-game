@@ -2,6 +2,7 @@ use bevy::app::{App, Plugin};
 
 mod options;
 mod question;
+mod results;
 mod tasks;
 
 pub struct GamePlugin;
@@ -12,6 +13,7 @@ impl Plugin for GamePlugin {
             tasks::TasksPlugin,
             question::QuestionPlugin,
             options::OptionsPlugin,
+            results::ResultsPlugin,
         ));
     }
 }
